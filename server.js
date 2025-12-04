@@ -1,6 +1,5 @@
 // backend/server.js
 const express = require("express");
-const cors = require("cors");
 const sqlite3 = require("sqlite3").verbose();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -29,7 +28,6 @@ app.use((req, res, next) => {
 });
 
 app.use(express.json());
-
 
 // ----- Database -----
 const dbPath = path.join(__dirname, "lotto.db");
@@ -70,24 +68,21 @@ function createToken(user) {
 }
 
 // ----- Middleware ตรวจ Token -----
-// ----- Middleware -----
-// เปิด CORS แบบตอบ preflight ครบ (แก้ CORS ERROR)
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-
-  // ตอบ Preflight request ของเบราว์เซอร์ (สำคัญสุด)
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(204);
+function authMiddleware(req, res, next) {
+  const authHeader = req.headers["authorization"] || "";
+  if (!authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ error: "No token provided" });
   }
+  const token = authHeader.slice(7);
 
-  next();  // << ต้องอยู่ในนี้
-});
-
-app.use(express.json());
-
-
+  try {
+    const payload = jwt.verify(token, JWT_SECRET);
+    req.userId = payload.userId;
+    next();
+  } catch (err) {
+    return res.status(401).json({ error: "Invalid or expired token" });
+  }
+}
 
 // ===================== AUTH =====================
 

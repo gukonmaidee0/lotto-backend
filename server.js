@@ -1,6 +1,5 @@
 // backend/server.js
 const express = require("express");
-const cors = require("cors");
 const sqlite3 = require("sqlite3").verbose();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -13,10 +12,21 @@ const PORT = process.env.PORT || 3000;
 // ใช้ SECRET จาก env ถ้าไม่มีให้ใช้ค่า default (แนะนำให้ตั้งเองเวลาออนไลน์)
 const JWT_SECRET = process.env.JWT_SECRET || "CHANGE_THIS_TO_YOUR_OWN_SECRET_123456";
 
-// ----- Middleware -----
-// เปิด CORS ให้ทุก origin ใช้ API ได้ (ให้ cors จัดการ preflight ให้ทั้งหมด)
-app.use(cors());
-app.options("*", cors());
+// ----- Middleware CORS แบบ manual ให้ทุก request -----
+app.use((req, res, next) => {
+  console.log("CORS middleware:", req.method, req.path); // ให้ดูใน log บน Render ได้
+
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
+  // ถ้าเป็น preflight (OPTIONS) ตอบกลับเลย
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(204);
+  }
+
+  next();
+});
 
 app.use(express.json());
 

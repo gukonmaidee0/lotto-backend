@@ -247,7 +247,12 @@ app.get("/api/histories", authMiddleware, (req, res) => {
 app.get("/", (req, res) => {
   res.json({ status: "Lotto backend OK" });
 });
+// Root test
+app.get("/", (req, res) => {
+  res.json({ status: "Lotto backend OK" });
+});
 
 app.listen(PORT, () => {
   console.log(`Lotto backend server running on http://localhost:${PORT}`);
 });
+

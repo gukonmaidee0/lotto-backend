@@ -14,15 +14,17 @@ const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || "CHANGE_THIS_TO_YOUR_OWN_SECRET_123456";
 
 // ----- Middleware -----
-// เปิด CORS ให้ทุก origin ใช้ API ได้
+// เปิด CORS แบบตอบ preflight ครบ (แก้ CORS ERROR)
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
   res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
+  // ตอบ Preflight request ของเบราว์เซอร์ (สำคัญสุด)
   if (req.method === "OPTIONS") {
-    // ตอบ preflight ทันที
     return res.sendStatus(204);
   }
+
   next();
 });
 
@@ -250,4 +252,3 @@ app.get("/", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Lotto backend server running on http://localhost:${PORT}`);
 });
-

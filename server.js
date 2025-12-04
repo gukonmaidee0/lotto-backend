@@ -14,12 +14,20 @@ const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || "CHANGE_THIS_TO_YOUR_OWN_SECRET_123456";
 
 // ----- Middleware -----
-app.use(cors({
-  origin: "*",
-  methods: ["GET", "POST"],
-  allowedHeaders: ["Content-Type", "Authorization"]
-}));
+// เปิด CORS ให้ทุก origin ใช้ API ได้
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  if (req.method === "OPTIONS") {
+    // ตอบ preflight ทันที
+    return res.sendStatus(204);
+  }
+  next();
+});
+
 app.use(express.json());
+
 
 // ----- Database -----
 const dbPath = path.join(__dirname, "lotto.db");
@@ -242,3 +250,4 @@ app.get("/", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Lotto backend server running on http://localhost:${PORT}`);
 });
+

@@ -1,5 +1,6 @@
 // backend/server.js
 const express = require("express");
+const cors = require("cors");
 const sqlite3 = require("sqlite3").verbose();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -13,19 +14,9 @@ const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || "CHANGE_THIS_TO_YOUR_OWN_SECRET_123456";
 
 // ----- Middleware -----
-// เปิด CORS แบบตอบ preflight ครบ (แก้ CORS ERROR)
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-
-  // ตอบ Preflight request ของเบราว์เซอร์ (สำคัญสุด)
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(204);
-  }
-
-  next();
-});
+// เปิด CORS ให้ทุก origin ใช้ API ได้ (ให้ cors จัดการ preflight ให้ทั้งหมด)
+app.use(cors());
+app.options("*", cors());
 
 app.use(express.json());
 
